@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  unpoller:
+    hostname: "unpoller"
+    image: ghcr.io/unpoller/unpoller:latest
+    container_name: unpoller
+    volumes:
+      - ./unpoller.conf:/etc/unpoller/up.conf
+    ports:
+      - 9130:9130
+    environment:
+      - UP_UNIFI_DEFAULT_USER=${UP_UNIFI_DEFAULT_USER}
+      - UP_UNIFI_DEFAULT_PASS=${UP_UNIFI_DEFAULT_PASS}
+      - UP_UNIFI_DEFAULT_URL=${UP_UNIFI_DEFAULT_URL}
+
+  prom:
+    hostname: prom
+    image: prom/prometheus
+    container_name: prom
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - 9090:9090
+
+  grafana:
+    image: grafana/grafana
+    container_name: pcw-grafana
+    volumes:
+      # - ./grafana.ini:/etc/grafana/grafana.ini
+      - grafana-data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+    ports:
+      - 3000:3000
+    environment:
+      - GF_PLUGINS_PREINSTALL=${GF_PLUGINS_PREINSTALL}
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+
+    depends_on:
+      - prom
+
+volumes:
+  prometheus-data:
+  grafana-data:
