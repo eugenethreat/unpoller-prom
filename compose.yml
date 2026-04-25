@@ -14,15 +14,27 @@ services:
       - UP_UNIFI_DEFAULT_PASS=${UP_UNIFI_DEFAULT_PASS}
       - UP_UNIFI_DEFAULT_URL=${UP_UNIFI_DEFAULT_URL}
 
-  prom:
-    hostname: prom
-    image: prom/prometheus
-    container_name: prom
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus-data:/prometheus
+#  prom:
+#    hostname: prom
+#    image: prom/prometheus
+#    container_name: prom
+#    volumes:
+#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#      - prometheus-data:/prometheus
+#    ports:
+#      - 9090:9090
+
+  victoriametrics:
+    image: victoriametrics/victoriametrics:latest
+    container_name: victoriametrics
     ports:
-      - 9090:9090
+      - 8428:8428
+    volumes:
+      - victoria-metrics-data:/victoria-metrics-data
+      - ./prometheus.yml:/prometheus.yml
+    command:
+      - -promscrape.config=/prometheus.yml
+      - -storageDataPath=/victoria-metrics-data
 
   grafana:
     image: grafana/grafana
@@ -39,8 +51,9 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
 
     depends_on:
-      - prom
+      - victoriametrics
 
 volumes:
-  prometheus-data:
+  # prometheus-data:
+  victoria-metrics-data:
   grafana-data:
