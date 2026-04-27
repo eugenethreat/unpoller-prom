@@ -25,7 +25,7 @@ services:
 #      - 9090:9090
 
   victoriametrics:
-    image: victoriametrics/victoriametrics:latest
+    image: victoriametrics/victoria-metrics:latest
     container_name: victoriametrics
     ports:
       - 8428:8428
