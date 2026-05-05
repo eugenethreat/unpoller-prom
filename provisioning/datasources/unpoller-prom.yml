@@ -4,7 +4,8 @@ datasources:
   - name: unpoller-prom
     type: prometheus
     access: proxy
-    url: http://prom:9090
+    # url: http://prom:9090
+    url: http://victoriametrics:8428
     jsonData:
       httpMethod: POST
       manageAlerts: true
