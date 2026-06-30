@@ -15,16 +15,6 @@ services:
       - UP_UNIFI_DEFAULT_PASS=${UP_UNIFI_DEFAULT_PASS}
       - UP_UNIFI_DEFAULT_URL=${UP_UNIFI_DEFAULT_URL}
 
-#  prom:
-#    hostname: prom
-#    image: prom/prometheus
-#    container_name: prom
-#    volumes:
-#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-#      - prometheus-data:/prometheus
-#    ports:
-#      - 9090:9090
-
   victoriametrics:
     image: victoriametrics/victoria-metrics:latest
     container_name: victoriametrics
@@ -54,7 +44,25 @@ services:
     depends_on:
       - victoriametrics
 
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ./loki-config.yml:/etc/loki/loki-config.yml
+
+  alloy:
+    image: grafana/alloy:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./alloy-config.alloy:/etc/alloy/alloy-config.alloy
+    command:
+      - run
+      - /etc/alloy/alloy-config.alloy
+    depends_on:
+      - loki
+
 volumes:
-  # prometheus-data:
   victoria-metrics-data:
   grafana-data:
